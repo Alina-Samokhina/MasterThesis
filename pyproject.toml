@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "masterthesis"
+version = "0.1.0"
+description = ""
+authors = ["Alina-Samokhina <alina.samokhina@phystech.edu>"]
+
+[tool.poetry.dependencies]
+python = ">=3.8,<3.10"
+
+[tool.poetry.dev-dependencies]
+numpy = "^1.20.2"
+scipy = "^1.6.2"
+sklearn = "^0.0"
+pandas = "^1.2.3"
+mne = "^0.22.1"
+moabb = "^0.3.0"
+pyriemann = "^0.2.6"
+torch = "^1.8.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -1,12 +1,30 @@
 # MasterThesis
-Master thesis on bayesian data generation models in multilabel classification of P300 potentials
+
+Master thesis on continuous time representation in signal decoding tasks.
 
 ## Abstract
-One of the most popular paradigms for brain-computer interfaces is P300. This thesis covers the multilabel classification task of P300 potentials, induced by the visual stimuli. It is proposed to use a bayesian models for data generation as an augmentation technique. This approach addresses the problem of small imbalanced datasets common in this area by not only augmenting existing data but also by being able to generate new one. In this work there is a comparison of several classifiction algorithms with different augmentations techniques. It is shown that suggested methods allow to obtain more accurate predictions along with quality synthetic data.
+
+In the signal decoding tasks, we work with multidimensional time series, which are a
+discretization of a continuous process. The latest works in neural ODE illustrate the
+possibility to work with recurrent neural networks as with differential equations.
+
+This work addresses such applications as change of sampling rate and handling missed or
+irregular data. It becomes possible if we represent our signal as a continuous in time
+function. This approach is relevant for signals from various wearable devices:
+accelerometers, heart rate monitors, devices for picking up brain signals such as
+electroencephalograms or electrocorticograms.
+
+The main result of this work is an algorithm which allows us to work with a signal as if
+it was a continuous function. We also look at different applications of this algorithm and
+propose to do further research on expanding the continuity of time to the continuity of
+space.
 
 ## Text
-The full text of the thesis can be found  [here](https://www.overleaf.com/read/vqxdbhnbzjts)
+
+The full text of the thesis can be found
+[here](https://www.overleaf.com/read/rjvmxvkmgvyg)
 
 ## Experiments
-For now it's all in the notebook, soon the training and visualizing woild be done through CLI (work in progress)
 
+For now it's all in the notebook, soon the training and visualizing woild be done through
+CLI (work in progress)

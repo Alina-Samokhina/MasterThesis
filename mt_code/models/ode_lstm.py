@@ -5,9 +5,9 @@ import torch.nn as nn
 from torchdyn.models import NeuralDE
 
 
-class ODELSTMCell(nn.Module):
+class OdeLstmCell(nn.Module):
     def __init__(self, input_size, hidden_size, solver_type="dopri5"):
-        super(ODELSTMCell, self).__init__()
+        super(OdeLstmCell, self).__init__()
         self.solver_type = solver_type
         self.fixed_step_solver = solver_type.startswith("fixed_")
         self.lstm = nn.LSTMCell(input_size, hidden_size)
@@ -71,7 +71,7 @@ class ODELSTMCell(nn.Module):
         return y + delta_t * (k1 + 2 * k2 + 2 * k3 + k4) / 6.0
 
 
-class ODELSTM(nn.Module):
+class OdeLstm(nn.Module):
     def __init__(
         self,
         in_features,
@@ -80,13 +80,13 @@ class ODELSTM(nn.Module):
         return_sequences=True,
         solver_type="dopri5",
     ):
-        super(ODELSTM, self).__init__()
+        super(OdeLstm, self).__init__()
         self.in_features = in_features
         self.hidden_size = hidden_size
         self.out_feature = out_feature
         self.return_sequences = return_sequences
 
-        self.rnn_cell = ODELSTMCell(in_features, hidden_size, solver_type=solver_type)
+        self.rnn_cell = OdeLstmCell(in_features, hidden_size, solver_type=solver_type)
         self.fc = nn.Linear(self.hidden_size, self.out_feature)
 
     def forward(self, x, timespans, mask=None):

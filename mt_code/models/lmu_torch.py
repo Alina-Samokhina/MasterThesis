@@ -123,7 +123,7 @@ class LMUCell(nn.Module):
         return h, m
 
 
-class LMULSTM(nn.Module):
+class LmuLstm(nn.Module):
     """ A layer for LMU-LSTM"""
 
     def __init__(

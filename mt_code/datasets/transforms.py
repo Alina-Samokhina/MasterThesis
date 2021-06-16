@@ -130,6 +130,8 @@ class ChannelwiseScaler(Transformer):
 
 
 class Clipper(Transformer):
+    """Clips otu of bound values. Useful for disconnected electrodes"""
+
     normalization = 1e-6  # for microvolts
 
     def __init__(self, minv: float, maxv: Optional[float] = None):

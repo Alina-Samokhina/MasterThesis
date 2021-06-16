@@ -1,4 +1,4 @@
-# Code based on the implementation of the ODE-LSTM Authors
+# Code based on the implementation of the ODE-LSTM Authors Mathias Lechner ad Ramin Hasani
 
 import torch
 import torch.nn as nn
@@ -11,7 +11,7 @@ class OdeLstmCell(nn.Module):
         self.solver_type = solver_type
         self.fixed_step_solver = solver_type.startswith("fixed_")
         self.lstm = nn.LSTMCell(input_size, hidden_size)
-        # 1 hidden layer NODE
+
         self.f_node = nn.Sequential(
             nn.Linear(hidden_size, hidden_size),
             nn.Tanh(),
@@ -41,7 +41,6 @@ class OdeLstmCell(nn.Module):
             device = input.device
             s_sort = ts[indices]
             s_sort = s_sort + torch.linspace(0, 1e-4, batch_size, device=device)
-            # HACK: Make sure no two points are equal
             trajectory = self.node.trajectory(new_h, s_sort)
             new_h = trajectory[indices, torch.arange(batch_size, device=device)]
 
@@ -72,6 +71,13 @@ class OdeLstmCell(nn.Module):
 
 
 class OdeLstm(nn.Module):
+    """ODE LSTM Neural Network.
+
+    Based on the paper
+    "Learning Long-Term Dependencies in Irregularly-Sampled Time Series"
+    https://arxiv.org/abs/2006.04418
+    """
+
     def __init__(
         self,
         in_features,
@@ -80,6 +86,16 @@ class OdeLstm(nn.Module):
         return_sequences=True,
         solver_type="dopri5",
     ):
+        """
+        Args:
+            in_features: number of channels
+            hidden_size: hidden dimension
+            out_feature: number of instances to predict (num of classes)
+            return_sequences: whether to get predictions for each input (if True),
+                or only one predictions per sequens(if False)
+            solver_type="dopri5": method for solving ODE
+
+        """
         super(OdeLstm, self).__init__()
         self.in_features = in_features
         self.hidden_size = hidden_size
@@ -89,7 +105,7 @@ class OdeLstm(nn.Module):
         self.rnn_cell = OdeLstmCell(in_features, hidden_size, solver_type=solver_type)
         self.fc = nn.Linear(self.hidden_size, self.out_feature)
 
-    def forward(self, x, timespans, mask=None):
+    def forward(self, x, timespans):
         device = x.device
         batch_size = x.size(0)
         seq_len = x.size(1)
@@ -105,13 +121,9 @@ class OdeLstm(nn.Module):
             hidden_state = self.rnn_cell.forward(inputs, hidden_state, ts)
             current_output = self.fc(hidden_state[0])
             outputs.append(current_output)
-            if mask is not None:
-                cur_mask = mask[:, t].view(batch_size, 1)
-                last_output = cur_mask * current_output + (1.0 - cur_mask) * last_output
-            else:
-                last_output = current_output
+            last_output = current_output
         if self.return_sequences:
-            outputs = torch.stack(outputs, dim=1)  # return entire sequence
+            outputs = torch.stack(outputs, dim=1)
         else:
-            outputs = last_output  # only last item
+            outputs = last_output
         return outputs

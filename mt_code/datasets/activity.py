@@ -1,3 +1,4 @@
+# Dataset upload by ODE LSTM authors Mathias Lechner ad Ramin Hasani
 import os
 import sys
 
@@ -5,6 +6,8 @@ import numpy as np
 
 
 class PersonData:
+    """Forms dataset of people activity and posture"""
+
     class_map = {
         "lying down": 0,
         "lying": 0,
@@ -36,7 +39,7 @@ class PersonData:
         self.data_dir = data_dir
         self.num_classes = 7
 
-        all_x, all_t, all_y = self.load_crappy_formated_csv()
+        all_x, all_t, all_y = self.load_csv()
         all_x, all_t, all_y = self.cut_in_sequences(
             all_x, all_t, all_y, seq_len=seq_len, inc=seq_len // 2
         )
@@ -60,8 +63,8 @@ class PersonData:
             print("Total number of train sequences: {}".format(self.train_x.shape[0]))
             print("Total number of test  sequences: {}".format(self.test_x.shape[0]))
 
-    def load_crappy_formated_csv(self):
-
+    def load_csv(self):
+        """Reformats csv data into user-friendly format"""
         all_x = []
         all_y = []
         all_t = []

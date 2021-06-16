@@ -10,11 +10,13 @@ from .transforms import make_eeg_pipe, slice_epochs
 
 
 class P300Dataset(Dataset):
+    """ Demons P300 Dataset in a format compatible to train along with activity dataset"""
 
     ch_names = ["Cz", "P3", "Pz", "P4", "PO3", "PO4", "O1", "O2"]
     sampling_rate = 500.0
     url = "https://gin.g-node.org/v-goncharenko/neiry-demons/raw/master/nery_demons_dataset.zip"  # noqa: E501
-
+    start_epoch = 0.0  # seconds since stimuli activation
+    end_epoch = 0.8  # seconds since stimuli activation
     _hdf_path = "p300dataset"
 
     _act_dtype = np.dtype(
@@ -84,6 +86,8 @@ class P300Dataset(Dataset):
         return tuple((eeg[:, :ind], *rest))
 
     def get_data(self):
+        """Reads data from each person's record file, obtainig eeg and labels"""
+
         for filename in os.listdir(self.data_dir):
             if ".hdf5" not in filename:
                 continue
@@ -114,24 +118,39 @@ class P300Dataset(Dataset):
         return torch.cat(self.eeg, dim=0), torch.cat(self.labels, dim=0)
 
     def transform_to_epochs(self, sessions):
+        """Slices eeg sequences into epochs, corresponding to each label"""
         eegs = self.transformation.fit_transform(sessions["eeg"])
         starts = sessions["starts"] // self.rate
         epochs = np.concatenate(
             [
-                slice_epochs(eeg, sts, int(self.rate * 0.1), int(self.rate * 0.8))
+                slice_epochs(
+                    eeg,
+                    sts,
+                    int(self.rate * self.start_epoch),
+                    int(self.rate * self.end_epoch),
+                )
                 for eeg, sts in zip(eegs, starts)
             ]
         )
         return epochs
 
     def get_data_for_experiments(self, verbose=False):
+        """
+        Obtains train|test splitted dataset for training alongside with another datasets
+        """
         all_x, all_y = self.get_data()
-        t = torch.arange(0, all_x.size(1), dtype=torch.float32)
+        t = torch.arange(
+            self.start_epoch,
+            self.end_epoch,
+            (self.end_epoch - self.start_epoch)
+            / all_x.size(1),  # (self.end_epoch-self.start_epoch)/all_x.size(1),
+            dtype=torch.float32,
+        )
         all_t = torch.stack([t] * all_x.size(0))
 
         total_seqs = all_x.shape[0]
-        permutation = np.random.RandomState(42).permutation(total_seqs)
-        test_size = int(0.2 * total_seqs)
+        permutation = np.random.RandomState(73).permutation(total_seqs)
+        test_size = int(0.3 * total_seqs)
 
         self.test_x = all_x[permutation[:test_size]]
         self.test_y = all_y[permutation[:test_size]]

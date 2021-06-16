@@ -8,3 +8,8 @@ __pycache__/
 runs/
 mlruns/
 logs/
+junk/
+lightning_logs/
+experiments/
+!experiments/*.ipynb
+*.zip

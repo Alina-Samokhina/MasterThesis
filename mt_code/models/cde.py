@@ -1,3 +1,6 @@
+# Code based on the Neural CDE authors repo
+# https://github.com/patrick-kidger/NeuralCDE
+
 import torch
 import torchcde
 
@@ -12,8 +15,6 @@ class CDEFunc(torch.nn.Module):
         self.linear1 = torch.nn.Linear(hidden_channels, 128)
         self.linear2 = torch.nn.Linear(128, input_channels * hidden_channels)
 
-    # t argument can be ignored unless you want your CDE to behave
-    # differently at different times, which would be unusual
     def forward(self, t, z):
         # z has shape (batch, hidden_channels)
         z = self.linear1(z)

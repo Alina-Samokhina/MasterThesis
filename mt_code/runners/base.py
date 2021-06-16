@@ -1,3 +1,4 @@
+# Code based on the implementation of the ODE-LSTM Authors Mathias Lechner ad Ramin Hasani
 import pytorch_lightning as pl
 import torch
 import torchmetrics
@@ -6,7 +7,14 @@ from torch import nn
 
 class Learner(pl.LightningModule):
     def __init__(
-        self, model, lr=0.005, timestamps=True, num_classes=7, class_weights=None
+        self,
+        model,
+        lr=0.005,
+        timestamps=True,
+        num_classes=7,
+        class_weights=None,
+        log_to="training.csv",
+        eps=1e-8,
     ):
         super().__init__()
         self.model = model
@@ -18,13 +26,10 @@ class Learner(pl.LightningModule):
         self.f1 = torchmetrics.F1(num_classes, average="weighted")
 
     def training_step(self, batch, batch_idx):
+        self.model.train()
         if self.timestamps:
-            if len(batch) == 4:
-                x, t, y, mask = batch
-            else:
-                x, t, y = batch
-                mask = None
-            y_hat = self.model.forward(x, t, mask)
+            x, t, y = batch
+            y_hat = self.model.forward(x, t)
 
         else:
             x, y = batch
@@ -32,7 +37,6 @@ class Learner(pl.LightningModule):
 
         y_hat = y_hat.view(-1, y_hat.size(-1))
         y = y.view(-1)
-        # f1_score = f1(nn.functional.softmax(y_hat), y)
         loss = nn.CrossEntropyLoss()(y_hat, y)
         preds = torch.argmax(y_hat.detach(), dim=-1)
         acc = self.accuracy(preds, y)
@@ -44,13 +48,10 @@ class Learner(pl.LightningModule):
         return {"loss": loss, "acc": acc, "f1": f1_score}
 
     def validation_step(self, batch, batch_idx):
+        self.model.eval()
         if self.timestamps:
-            if len(batch) == 4:
-                x, t, y, mask = batch
-            else:
-                x, t, y = batch
-                mask = None
-            y_hat = self.model.forward(x, t, mask)
+            x, t, y = batch
+            y_hat = self.model.forward(x, t)
         else:
             x, y = batch
             y_hat = self.model.forward(x)

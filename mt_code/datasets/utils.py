@@ -42,7 +42,7 @@ def load_dataset(
         train_ts = torch.Tensor(dataset.train_t)[:, :, None]
         test_ts = torch.Tensor(dataset.test_t)[:, :, None]
     else:
-        raise ValueError(f'No such dataset: {ds}, try "activity"')
+        raise ValueError(f'No such dataset: {ds}, try "activity" or "p300"')
 
     train_x = torch.Tensor(dataset.train_x)
     test_x = torch.Tensor(dataset.test_x)

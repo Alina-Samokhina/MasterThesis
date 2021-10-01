@@ -2,7 +2,7 @@
 
 import torch
 import torch.nn as nn
-from torchdyn.models import NeuralDE
+from torchdyn.models import NeuralODE
 
 
 class OdeLstmCell(nn.Module):
@@ -20,7 +20,7 @@ class OdeLstmCell(nn.Module):
         self.input_size = input_size
         self.hidden_size = hidden_size
         if not self.fixed_step_solver:
-            self.node = NeuralDE(self.f_node, solver=solver_type)
+            self.node = NeuralODE(self.f_node, solver=solver_type)
         else:
             options = {
                 "fixed_euler": self.euler,

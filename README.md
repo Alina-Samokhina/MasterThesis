@@ -26,5 +26,5 @@ The full text of the thesis can be found
 
 ## Experiments
 
-For now it's all in the notebook, soon the training and visualizing woild be done through
+For now it's all in the notebook, soon the training and visualizing would be done through
 CLI (work in progress)
